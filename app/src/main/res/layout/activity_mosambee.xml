@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+ <EditText
+     android:id="@+id/eTuserId"
+     android:hint="User Id"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/eTPass"
+        android:hint="Password"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:text="INIT API"
+        android:onClick="bTinitApi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="OnClick" />
+<View
+    android:layout_width="match_parent"
+    android:background="@color/colorPrimaryDark"
+    android:layout_height="2dp"/>
+    <Button
+
+        android:text="HEALTH CHECK"
+        android:onClick="healthCheck"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="OnClick" />
+
+    <View
+        android:layout_width="match_parent"
+        android:background="@color/colorPrimaryDark"
+        android:layout_height="2dp"/>
+    <EditText
+        android:id="@+id/eTAmount"
+        android:hint="Amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:text="Pay Using Intent App"
+        android:onClick="pay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="OnClick" />
+
+    <Button
+        android:text="Pay Using Mosambee"
+        android:onClick="payUsingMosambee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="OnClick" />
+
+
+
+</LinearLayout>

@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">SoftPosTest</string>
+    <string name="app_name">SoftPos Test</string>
+    <string name="pay_using_softpos">Pay Using SoftPOS</string>
+    <string name="health_check">HEALTH CHECK</string>
+    <string name="init_api">INIT API</string>
+    <string name="user_id">User Id</string>
+    <string name="password">Password</string>
 </resources>

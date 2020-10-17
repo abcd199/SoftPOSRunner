@@ -5,61 +5,57 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:layout_margin="20dp"
     tools:context=".MainActivity">
- <EditText
-     android:id="@+id/eTuserId"
-     android:hint="User Id"
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content"/>
 
-    <EditText
-        android:id="@+id/eTPass"
-        android:hint="Password"
+   <EditText
+       android:id="@+id/eTuserId"
+       android:hint="@string/user_id"
+       android:layout_marginTop="30dp"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content" />
 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:text="INIT API"
-        android:onClick="bTinitApi"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:ignore="OnClick" />
-<View
-    android:layout_width="match_parent"
-    android:background="@color/colorPrimaryDark"
-    android:layout_height="2dp"/>
-    <Button
+   <EditText
+       android:id="@+id/eTPass"
+       android:hint="@string/password"
 
-        android:text="HEALTH CHECK"
-        android:onClick="healthCheck"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:ignore="OnClick" />
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content" />
 
-    <View
-        android:layout_width="match_parent"
-        android:background="@color/colorPrimaryDark"
-        android:layout_height="2dp"/>
-    <EditText
-        android:id="@+id/eTAmount"
-        android:hint="Amount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+   <Button
+       android:text="@string/init_api"
+       android:background="@color/colorPrimary"
+       android:textColor="@android:color/white"
+       android:onClick="bTinitApi"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       tools:ignore="OnClick" />
 
-    <Button
-        android:text="Pay Using Intent App"
-        android:onClick="pay"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:ignore="OnClick" />
-
-    <Button
-        android:text="Pay Using Mosambee"
-        android:onClick="payUsingMosambee"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:ignore="OnClick" />
+   <Button
+       android:text="@string/health_check"
+       android:layout_marginTop="30dp"
+       android:background="@color/colorPrimary"
+       android:textColor="@android:color/white"
+       android:onClick="healthCheck"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       tools:ignore="OnClick" />
 
 
+   <EditText
+       android:id="@+id/eTAmount"
+       android:layout_marginTop="30dp"
+       android:hint="Amount"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content" />
+
+   <Button
+       android:text="@string/pay_using_softpos"
+       android:background="@color/colorPrimary"
+       android:textColor="@android:color/white"
+       android:onClick="pay"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       tools:ignore="OnClick" />
 
 </LinearLayout>

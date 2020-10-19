@@ -2,17 +2,16 @@ package com.cpoc.softpostest;
 
 
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
@@ -21,8 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -49,6 +47,25 @@ public class MainActivity extends AppCompatActivity {
     String userId;
     String password;
 
+    private ApiType apiType;
+
+    public ApiType getApiType() {
+        return apiType;
+    }
+
+    public void setApiType(ApiType apiType) {
+        this.apiType = apiType;
+    }
+
+    public void pay(View view) {
+
+        setApiType(ApiType.PAYMENT);
+
+        new TestAsync().execute();
+
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,105 +85,22 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void pay(View view) {
-
-        boolean isInstalled = Utils.isPackageInstalled(Constants.SOFTPOS_PACKAGE_NAME, getPackageManager());
-
-        if (!isInstalled) {
-
-            new AlertDialog.Builder(this)
-                    .setTitle("Message")
-                    .setMessage("This Application require Mosambee SoftPOS in a Device")
-                    .setPositiveButton("OK", null)
-                    .show();
-
-            return;
-        }
-
-        if ((etAmount.getText().toString() != "")) {
-
-            int am = 0;
-
-            try {
-                am = Integer.parseInt(etAmount.getText().toString());
-
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, "Not a valid integer", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            Intent intent = new Intent();
-            intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
-            Bundle mBundle = new Bundle();
-            mBundle.putString("amount", String.format("%d", am));
-            mBundle.putString("sessionId", Utils.getToken(this));
-            mBundle.putString("mobNo", "8424834651");
-            mBundle.putString("description", "description");
-            intent.putExtras(mBundle);
-            intent.setAction(Constants.SOFTPOS_PAYMENT_ACTION);
-            startActivityForResult(intent, Constants.ActivityPaymentRequestCode);
-        } else {
-            Toast.makeText(this, "Amount can not be black", Toast.LENGTH_LONG).show();
-        }
-    }
-
-
     public void healthCheck(View view) {
-        boolean isInstalled = Utils.isPackageInstalled(Constants.SOFTPOS_PACKAGE_NAME, getPackageManager());
-
-        if (!isInstalled) {
-
-            new AlertDialog.Builder(this)
-                    .setTitle("Message")
-                    .setMessage("This Application require Mosambee SoftPOS in a Device")
-                    .setPositiveButton("OK", null)
-                    .show();
-
-            return;
-        }
-
-        Intent intent = new Intent();
-        intent.setAction(Constants.SOFTPOS_HEALTHCHECK_ACTION);
-        intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
-        Bundle bundle = new Bundle();
-        bundle.putString("sessionId", Utils.getToken(this));
-        intent.putExtras(bundle);
-        startActivityForResult(intent, Constants.ActivityHealthCheckRequestCode);
+        setApiType(ApiType.HEALTH);
+        new TestAsync().execute();
     }
 
     public void bTinitApi(View view) {
-        boolean isInstalled = Utils.isPackageInstalled(Constants.SOFTPOS_PACKAGE_NAME, getPackageManager());
 
-        if (!isInstalled) {
-
-            new AlertDialog.Builder(this)
-                    .setTitle("Message")
-                    .setMessage("This Application require Mosambee SoftPOS in a Device")
-                    .setPositiveButton("OK", null)
-                    .show();
-
-            return;
-        }
-
-        if ((etUserId.getText().toString() != "") && (eTPass.getText().toString() != "")) {
-            setPassword(eTPass.getText().toString());
-            setUserId(etUserId.getText().toString());
-
-            Intent intent = new Intent();
-            Bundle mBundle = new Bundle();
-            mBundle.putString("userName", getUserId());
-            mBundle.putString("password", getPassword());
-            intent.putExtras(mBundle);
-            intent.setAction(Constants.SOFTPOS_INIT_ACTION);
-            intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
-            startActivityForResult(intent, Constants.ActivityLoginRequestCode);
-        }
+        setApiType(ApiType.LOGIN);
+        new TestAsync().execute();
     }
+
+    enum ApiType {LOGIN, HEALTH, PAYMENT}
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonParser jp = new JsonParser();
@@ -228,5 +162,92 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    class TestAsync extends AsyncTask<Void, Integer, Boolean> {
+        String TAG = getClass().getSimpleName();
+
+        protected Boolean doInBackground(Void... arg0) {
+
+            final PackageManager pm = getPackageManager();
+            List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+
+            for (ApplicationInfo packageInfo : packages) {
+                Log.d(TAG, "Installed package :" + packageInfo.packageName);
+                Log.d(TAG, "Source dir : " + packageInfo.sourceDir);
+                Log.d(TAG, "Launch Activity :" + pm.getLaunchIntentForPackage(packageInfo.packageName));
+
+                if (packageInfo.packageName.contains(Constants.SOFTPOS_PACKAGE_NAME)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            if (!result) {
+
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Message")
+                        .setMessage("This Application require Mosambee SoftPOS in a Device")
+                        .setPositiveButton("OK", null)
+                        .show();
+
+            } else {
+                if (getApiType().equals(ApiType.PAYMENT)) {
+
+                    if ((etAmount.getText().toString() != "")) {
+
+                        int am = 0;
+
+                        try {
+                            am = Integer.parseInt(etAmount.getText().toString());
+
+                        } catch (NumberFormatException e) {
+                            Toast.makeText(MainActivity.this, "Not a valid integer", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
+                        Intent intent = new Intent();
+                        intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+                        Bundle mBundle = new Bundle();
+                        mBundle.putString("amount", String.format("%d", am));
+                        mBundle.putString("sessionId", Utils.getToken(MainActivity.this));
+                        mBundle.putString("mobNo", "8424834651");
+                        mBundle.putString("description", "description");
+                        intent.putExtras(mBundle);
+                        intent.setAction(Constants.SOFTPOS_PAYMENT_ACTION);
+                        startActivityForResult(intent, Constants.ActivityPaymentRequestCode);
+                    } else {
+                        Toast.makeText(MainActivity.this, "Amount can not be black", Toast.LENGTH_LONG).show();
+                    }
+                } else if (getApiType().equals(ApiType.LOGIN)) {
+
+                    if ((etUserId.getText().toString() != "") && (eTPass.getText().toString() != "")) {
+                        setPassword(eTPass.getText().toString());
+                        setUserId(etUserId.getText().toString());
+
+                        Intent intent = new Intent();
+                        Bundle mBundle = new Bundle();
+                        mBundle.putString("userName", getUserId());
+                        mBundle.putString("password", getPassword());
+                        intent.putExtras(mBundle);
+                        intent.setAction(Constants.SOFTPOS_INIT_ACTION);
+                        intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+                        startActivityForResult(intent, Constants.ActivityLoginRequestCode);
+                    }
+                } else if (getApiType().equals(ApiType.HEALTH)) {
+
+                    Intent intent = new Intent();
+                    intent.setAction(Constants.SOFTPOS_HEALTHCHECK_ACTION);
+                    intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("sessionId", Utils.getToken(MainActivity.this));
+                    intent.putExtras(bundle);
+                    startActivityForResult(intent, Constants.ActivityHealthCheckRequestCode);
+                }
+            }
+        }
+    }
 
 }

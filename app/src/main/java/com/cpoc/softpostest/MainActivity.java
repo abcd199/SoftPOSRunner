@@ -145,12 +145,12 @@ public class MainActivity extends AppCompatActivity {
             String responseCode = data.getStringExtra("responseCode");
 
             String showResponse = response;
-            try {
-                je = jp.parse(response);
-                showResponse = gson.toJson(je);
-            } catch (JsonSyntaxException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                je = jp.parse(response);
+//                showResponse = gson.toJson(je);
+//            } catch (JsonSyntaxException e) {
+//                e.printStackTrace();
+//            }
 
             new AlertDialog.Builder(this)
                     .setTitle("Receipt")
@@ -215,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
                         mBundle.putString("sessionId", Utils.getToken(MainActivity.this));
                         mBundle.putString("mobNo", "8424834651");
                         mBundle.putString("description", "description");
+
                         intent.putExtras(mBundle);
                         intent.setAction(Constants.SOFTPOS_PAYMENT_ACTION);
                         startActivityForResult(intent, Constants.ActivityPaymentRequestCode);
@@ -235,10 +236,13 @@ public class MainActivity extends AppCompatActivity {
                         intent.setAction(Constants.SOFTPOS_INIT_ACTION);
                         intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
                         startActivityForResult(intent, Constants.ActivityLoginRequestCode);
+
+
                     }
                 } else if (getApiType().equals(ApiType.HEALTH)) {
 
                     Intent intent = new Intent();
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.setAction(Constants.SOFTPOS_HEALTHCHECK_ACTION);
                     intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
                     Bundle bundle = new Bundle();

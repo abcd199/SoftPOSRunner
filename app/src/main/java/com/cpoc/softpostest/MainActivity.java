@@ -96,7 +96,15 @@ public class MainActivity extends AppCompatActivity {
         new TestAsync().execute();
     }
 
-    enum ApiType {LOGIN, HEALTH, PAYMENT}
+    public void getDetails(View view) {
+        setApiType(ApiType.DETAILS);
+        new TestAsync().execute();
+    }
+
+    public void uploadLogs(View view) {
+        setApiType(ApiType.CRASHLOGS);
+        new TestAsync().execute();
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -114,11 +122,18 @@ public class MainActivity extends AppCompatActivity {
 
             Utils.setToken(MainActivity.this, sessionId);
 
-            new AlertDialog.Builder(this)
-                    .setTitle("Login")
-                    .setMessage("Session Id : " + sessionId + "\n" + "Response Code : " + responseCode + "\n" + "Description : " + description)
-                    .setPositiveButton("OK", null)
-                    .show();
+//            new AlertDialog.Builder(this)
+//                    .setTitle("Login")
+//                    .setMessage("Session Id : " + sessionId + "\n" + "Response Code : " + responseCode + "\n" + "Description : " + description)
+//                    .setPositiveButton("OK", null)
+//                    .show();
+
+            if (null != sessionId && "0".equals(responseCode)) {
+                setApiType(ApiType.PAYMENT);
+
+                new TestAsync().execute();
+            }
+
 
         } else if (requestCode == Constants.ActivityHealthCheckRequestCode) {
             String responseCode = data.getStringExtra("responseCode");
@@ -159,8 +174,37 @@ public class MainActivity extends AppCompatActivity {
                             "ReceiptResponse : " + showResponse + "\n" + "PaymentDescription : " + paymentDescription)
                     .setPositiveButton("OK", null)
                     .show();
+        } else if (requestCode == Constants.ActivityDetailsRequestCode) {
+
+            String appVersion = data.getStringExtra("appVersion");
+            String backendVersion = data.getStringExtra("backendVersion");
+            String kcv = data.getStringExtra("kcv");
+            String description = data.getStringExtra("description");
+
+            new AlertDialog.Builder(this)
+                    .setTitle("App Details")
+                    .setMessage("App Version : " + appVersion + "\n" +
+                            "Backend Version : " + backendVersion + "\n" +
+                            "Application KCV : " + kcv + "\n" +
+                            "Description : " + description
+                    )
+                    .setPositiveButton("OK", null)
+                    .show();
+        } else if (requestCode == Constants.ActivityLogsRequestCode) {
+
+            String description = data.getStringExtra("description");
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Details")
+                    .setMessage(
+                            "Description : " + description
+                    )
+                    .setPositiveButton("OK", null)
+                    .show();
         }
     }
+
+    enum ApiType {LOGIN, HEALTH, PAYMENT, DETAILS, CRASHLOGS}
 
     class TestAsync extends AsyncTask<Void, Integer, Boolean> {
         String TAG = getClass().getSimpleName();
@@ -249,6 +293,21 @@ public class MainActivity extends AppCompatActivity {
                     bundle.putString("sessionId", Utils.getToken(MainActivity.this));
                     intent.putExtras(bundle);
                     startActivityForResult(intent, Constants.ActivityHealthCheckRequestCode);
+                } else if (getApiType().equals(ApiType.DETAILS)) {
+
+                    Intent intent = new Intent();
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setAction(Constants.SOFTPOS_DETAILS_ACTION);
+                    intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+                    startActivityForResult(intent, Constants.ActivityDetailsRequestCode);
+                } else if (getApiType().equals(ApiType.CRASHLOGS)) {
+
+                    Intent intent = new Intent();
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setAction(Constants.SOFTPOS_LOGS_ACTION);
+                    intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+
+                    startActivityForResult(intent, Constants.ActivityLogsRequestCode);
                 }
             }
         }

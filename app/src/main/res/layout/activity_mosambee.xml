@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -56,6 +55,27 @@
        android:onClick="pay"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
+       tools:ignore="OnClick" />
+
+   <Button
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="30dp"
+       android:background="@color/colorPrimary"
+       android:onClick="getDetails"
+       android:text="@string/get_app_details"
+       android:textColor="@android:color/white"
+       tools:ignore="OnClick" />
+
+
+   <Button
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="30dp"
+       android:background="@color/colorPrimary"
+       android:onClick="uploadLogs"
+       android:text="@string/upload_crash_logs"
+       android:textColor="@android:color/white"
        tools:ignore="OnClick" />
 
 </LinearLayout>

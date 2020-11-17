@@ -73,8 +73,8 @@
        android:layout_height="wrap_content"
        android:layout_marginTop="30dp"
        android:background="@color/colorPrimary"
-       android:onClick="uploadLogs"
-       android:text="@string/upload_crash_logs"
+       android:onClick="getLastReceipt"
+       android:text="@string/get_last_receipt"
        android:textColor="@android:color/white"
        tools:ignore="OnClick" />
 

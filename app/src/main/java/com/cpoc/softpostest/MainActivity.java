@@ -61,8 +61,34 @@ public class MainActivity extends AppCompatActivity {
 
         setApiType(ApiType.PAYMENT);
 
-        new TestAsync().execute();
+//        new TestAsync().execute();
 
+        if ((etAmount.getText().toString() != "")) {
+
+            int am = 0;
+
+            try {
+                am = Integer.parseInt(etAmount.getText().toString());
+
+            } catch (NumberFormatException e) {
+                Toast.makeText(MainActivity.this, "Not a valid integer", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            Intent intent = new Intent();
+            intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+            Bundle mBundle = new Bundle();
+            mBundle.putString("amount", String.format("%d", am));
+            mBundle.putString("sessionId", Utils.getToken(MainActivity.this));
+            mBundle.putString("mobNo", "8424834651");
+            mBundle.putString("description", "description");
+
+            intent.putExtras(mBundle);
+            intent.setAction(Constants.SOFTPOS_PAYMENT_ACTION);
+            startActivityForResult(intent, Constants.ActivityPaymentRequestCode);
+        } else {
+            Toast.makeText(MainActivity.this, "Amount can not be black", Toast.LENGTH_LONG).show();
+        }
 
     }
 
@@ -87,13 +113,39 @@ public class MainActivity extends AppCompatActivity {
 
     public void healthCheck(View view) {
         setApiType(ApiType.HEALTH);
-        new TestAsync().execute();
+//        new TestAsync().execute();
+
+
+        Intent intent = new Intent();
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setAction(Constants.SOFTPOS_HEALTHCHECK_ACTION);
+        intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+        Bundle bundle = new Bundle();
+        bundle.putString("sessionId", Utils.getToken(MainActivity.this));
+        intent.putExtras(bundle);
+        startActivityForResult(intent, Constants.ActivityHealthCheckRequestCode);
     }
 
     public void bTinitApi(View view) {
 
         setApiType(ApiType.LOGIN);
-        new TestAsync().execute();
+//        new TestAsync().execute();
+
+        if ((etUserId.getText().toString() != "") && (eTPass.getText().toString() != "")) {
+            setPassword(eTPass.getText().toString());
+            setUserId(etUserId.getText().toString());
+
+            Intent intent = new Intent();
+            Bundle mBundle = new Bundle();
+            mBundle.putString("userName", getUserId());
+            mBundle.putString("password", getPassword());
+            intent.putExtras(mBundle);
+            intent.setAction(Constants.SOFTPOS_INIT_ACTION);
+            intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+            startActivityForResult(intent, Constants.ActivityLoginRequestCode);
+
+
+        }
     }
 
     public void getDetails(View view) {
@@ -106,13 +158,29 @@ public class MainActivity extends AppCompatActivity {
         new TestAsync().execute();
     }
 
+
+    public void getLastReceipt(View view) {
+
+        Intent intent = new Intent();
+        intent.setAction(Constants.SOFTPOS_LAST_TRANSACTION_ACTION);
+        intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+        startActivityForResult(intent, Constants.ActivityLastReceiptRequestCode);
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        Toast.makeText(MainActivity.this, "Got result", Toast.LENGTH_SHORT).show();
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonParser jp = new JsonParser();
         JsonElement je;
+
+        if (resultCode == -1) {
+            return;
+        }
 
         if (requestCode == Constants.ActivityLoginRequestCode) {
 
@@ -122,17 +190,17 @@ public class MainActivity extends AppCompatActivity {
 
             Utils.setToken(MainActivity.this, sessionId);
 
-//            new AlertDialog.Builder(this)
-//                    .setTitle("Login")
-//                    .setMessage("Session Id : " + sessionId + "\n" + "Response Code : " + responseCode + "\n" + "Description : " + description)
-//                    .setPositiveButton("OK", null)
-//                    .show();
+            new AlertDialog.Builder(this)
+                    .setTitle("Login")
+                    .setMessage("Session Id : " + sessionId + "\n" + "Response Code : " + responseCode + "\n" + "Description : " + description)
+                    .setPositiveButton("OK", null)
+                    .show();
 
-            if (null != sessionId && "0".equals(responseCode)) {
-                setApiType(ApiType.PAYMENT);
-
-                new TestAsync().execute();
-            }
+//            if (null != sessionId && "0".equals(responseCode)) {
+//                setApiType(ApiType.PAYMENT);
+//
+//                new TestAsync().execute();
+//            }
 
 
         } else if (requestCode == Constants.ActivityHealthCheckRequestCode) {
@@ -160,12 +228,6 @@ public class MainActivity extends AppCompatActivity {
             String responseCode = data.getStringExtra("responseCode");
 
             String showResponse = response;
-//            try {
-//                je = jp.parse(response);
-//                showResponse = gson.toJson(je);
-//            } catch (JsonSyntaxException e) {
-//                e.printStackTrace();
-//            }
 
             new AlertDialog.Builder(this)
                     .setTitle("Receipt")
@@ -201,10 +263,27 @@ public class MainActivity extends AppCompatActivity {
                     )
                     .setPositiveButton("OK", null)
                     .show();
+        } else if (requestCode == Constants.ActivityLastReceiptRequestCode) {
+
+            String response = data.getStringExtra("receiptResponse");
+            String paymentDescription = data.getStringExtra("paymentDescription");
+            String paymentResponseCode = data.getStringExtra("paymentResponseCode");
+            String responseCode = data.getStringExtra("responseCode");
+
+            String showResponse = response;
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Receipt")
+                    .setMessage("ResponseCode : " + responseCode + "\n" +
+                            "PaymentResponseCode : " + paymentResponseCode + "\n" +
+                            "ReceiptResponse : " + showResponse + "\n" + "PaymentDescription : " + paymentDescription)
+                    .setPositiveButton("OK", null)
+                    .show();
         }
     }
 
-    enum ApiType {LOGIN, HEALTH, PAYMENT, DETAILS, CRASHLOGS}
+
+    enum ApiType {LOGIN, HEALTH, PAYMENT, DETAILS, CRASHLOGS, LASTRECEIPT}
 
     class TestAsync extends AsyncTask<Void, Integer, Boolean> {
         String TAG = getClass().getSimpleName();
@@ -300,14 +379,14 @@ public class MainActivity extends AppCompatActivity {
                     intent.setAction(Constants.SOFTPOS_DETAILS_ACTION);
                     intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
                     startActivityForResult(intent, Constants.ActivityDetailsRequestCode);
-                } else if (getApiType().equals(ApiType.CRASHLOGS)) {
+                } else if (getApiType().equals(ApiType.LASTRECEIPT)) {
 
                     Intent intent = new Intent();
 //                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.setAction(Constants.SOFTPOS_LOGS_ACTION);
+                    intent.setAction(Constants.SOFTPOS_LAST_TRANSACTION_ACTION);
                     intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
 
-                    startActivityForResult(intent, Constants.ActivityLogsRequestCode);
+                    startActivityForResult(intent, Constants.ActivityLastReceiptRequestCode);
                 }
             }
         }

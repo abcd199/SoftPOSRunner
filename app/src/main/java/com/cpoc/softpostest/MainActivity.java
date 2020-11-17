@@ -26,7 +26,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
 
-    EditText etUserId, eTPass, etAmount;
+    EditText etUserId, eTPass, etAmount, eTDesc;
 
     public String getUserId() {
         return userId;
@@ -57,38 +57,13 @@ public class MainActivity extends AppCompatActivity {
         this.apiType = apiType;
     }
 
+    String qrMetadata = new StringBuilder().append("\"saleQrCodeMetadata\": \"http://m.p-y.tm/edcposqa?\n").append("tid=12345689&mid=INTERNAL30020749789883&acquirementId=426111212800110168509721887635&receiptId=541e38574d3091d4f\n").append("9a09121c0afpgperfeos1&dir=EOS20200\"").toString();
+
     public void pay(View view) {
 
         setApiType(ApiType.PAYMENT);
 
-//        new TestAsync().execute();
-
-        if ((etAmount.getText().toString() != "")) {
-
-            int am = 0;
-
-            try {
-                am = Integer.parseInt(etAmount.getText().toString());
-
-            } catch (NumberFormatException e) {
-                Toast.makeText(MainActivity.this, "Not a valid integer", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            Intent intent = new Intent();
-            intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
-            Bundle mBundle = new Bundle();
-            mBundle.putString("amount", String.format("%d", am));
-            mBundle.putString("sessionId", Utils.getToken(MainActivity.this));
-            mBundle.putString("mobNo", "8424834651");
-            mBundle.putString("description", "description");
-
-            intent.putExtras(mBundle);
-            intent.setAction(Constants.SOFTPOS_PAYMENT_ACTION);
-            startActivityForResult(intent, Constants.ActivityPaymentRequestCode);
-        } else {
-            Toast.makeText(MainActivity.this, "Amount can not be black", Toast.LENGTH_LONG).show();
-        }
+        new TestAsync().execute();
 
     }
 
@@ -103,49 +78,28 @@ public class MainActivity extends AppCompatActivity {
 
         etAmount = findViewById(R.id.eTAmount);
 
+        eTDesc = findViewById(R.id.eTDesc);
+
         etUserId.setText(Constants.USERNAME);
 
         eTPass.setText(Constants.PASSWORD);
 
         etAmount.setText("1");
 
+
     }
 
     public void healthCheck(View view) {
         setApiType(ApiType.HEALTH);
-//        new TestAsync().execute();
+        new TestAsync().execute();
 
-
-        Intent intent = new Intent();
-//                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(Constants.SOFTPOS_HEALTHCHECK_ACTION);
-        intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
-        Bundle bundle = new Bundle();
-        bundle.putString("sessionId", Utils.getToken(MainActivity.this));
-        intent.putExtras(bundle);
-        startActivityForResult(intent, Constants.ActivityHealthCheckRequestCode);
     }
 
     public void bTinitApi(View view) {
 
         setApiType(ApiType.LOGIN);
-//        new TestAsync().execute();
+        new TestAsync().execute();
 
-        if ((etUserId.getText().toString() != "") && (eTPass.getText().toString() != "")) {
-            setPassword(eTPass.getText().toString());
-            setUserId(etUserId.getText().toString());
-
-            Intent intent = new Intent();
-            Bundle mBundle = new Bundle();
-            mBundle.putString("userName", getUserId());
-            mBundle.putString("password", getPassword());
-            intent.putExtras(mBundle);
-            intent.setAction(Constants.SOFTPOS_INIT_ACTION);
-            intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
-            startActivityForResult(intent, Constants.ActivityLoginRequestCode);
-
-
-        }
     }
 
     public void getDetails(View view) {
@@ -161,10 +115,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void getLastReceipt(View view) {
 
-        Intent intent = new Intent();
-        intent.setAction(Constants.SOFTPOS_LAST_TRANSACTION_ACTION);
-        intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
-        startActivityForResult(intent, Constants.ActivityLastReceiptRequestCode);
+
+        setApiType(ApiType.LASTRECEIPT);
+        new TestAsync().execute();
 
     }
 
@@ -337,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
                         mBundle.putString("amount", String.format("%d", am));
                         mBundle.putString("sessionId", Utils.getToken(MainActivity.this));
                         mBundle.putString("mobNo", "8424834651");
-                        mBundle.putString("description", "description");
+                        mBundle.putString("description", eTDesc.getText().toString() + ":" + qrMetadata);
 
                         intent.putExtras(mBundle);
                         intent.setAction(Constants.SOFTPOS_PAYMENT_ACTION);

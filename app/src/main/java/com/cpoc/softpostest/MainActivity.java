@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         this.apiType = apiType;
     }
 
-    String qrMetadata = new StringBuilder().append("\"saleQrCodeMetadata\": \"http://m.p-y.tm/edcposqa?\n").append("tid=12345689&mid=INTERNAL30020749789883&acquirementId=426111212800110168509721887635&receiptId=541e38574d3091d4f\n").append("9a09121c0afpgperfeos1&dir=EOS20200\"").toString();
+//    String qrMetadata = new StringBuilder().append("\"saleQrCodeMetadata\": \"http://m.p-y.tm/edcposqa?\n").append("tid=12345689&mid=INTERNAL30020749789883&acquirementId=426111212800110168509721887635&receiptId=541e38574d3091d4f\n").append("9a09121c0afpgperfeos1&dir=EOS20200\"").toString();
 
     public void pay(View view) {
 
@@ -290,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
                         mBundle.putString("amount", String.format("%d", am));
                         mBundle.putString("sessionId", Utils.getToken(MainActivity.this));
                         mBundle.putString("mobNo", "8424834651");
-                        mBundle.putString("description", eTDesc.getText().toString() + ":" + qrMetadata);
+                        mBundle.putString("description", eTDesc.getText().toString());
 
                         intent.putExtras(mBundle);
                         intent.setAction(Constants.SOFTPOS_PAYMENT_ACTION);

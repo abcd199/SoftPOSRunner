@@ -57,15 +57,20 @@ public class MainActivity extends AppCompatActivity {
         this.apiType = apiType;
     }
 
-//    String qrMetadata = new StringBuilder().append("\"saleQrCodeMetadata\": \"http://m.p-y.tm/edcposqa?\n").append("tid=12345689&mid=INTERNAL30020749789883&acquirementId=426111212800110168509721887635&receiptId=541e38574d3091d4f\n").append("9a09121c0afpgperfeos1&dir=EOS20200\"").toString();
 
-    public void pay(View view) {
+    public void payPAYTM(View view) {
 
-        setApiType(ApiType.PAYMENT);
+        setApiType(ApiType.PAYMENT_MERCHANT);
 
         new TestAsync().execute();
 
     }
+
+
+    boolean isMosambeeExist = false;
+
+    boolean isPaytmAppExist = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,42 +89,38 @@ public class MainActivity extends AppCompatActivity {
 
         eTPass.setText(Constants.PASSWORD);
 
-        etAmount.setText("1");
+        etAmount.setText("100");
+
+
+        isPaytmAppExist = isPaytmAppExist();
+
+
+
 
 
     }
 
-    public void healthCheck(View view) {
-        setApiType(ApiType.HEALTH);
+
+    public void healthCheckPaytm(View view) {
+        setApiType(ApiType.HEALTH_MERCHANT);
         new TestAsync().execute();
 
     }
 
-    public void bTinitApi(View view) {
 
-        setApiType(ApiType.LOGIN);
+    public void bTinitApiPAYTM(View view) {
+
+        setApiType(ApiType.LOGIN_MERCHANT);
         new TestAsync().execute();
 
     }
 
-    public void getDetails(View view) {
-        setApiType(ApiType.DETAILS);
+
+    public void getDetailsPaytm(View view) {
+        setApiType(ApiType.DETAILS_MERCHANT);
         new TestAsync().execute();
     }
 
-    public void uploadLogs(View view) {
-        setApiType(ApiType.CRASHLOGS);
-        new TestAsync().execute();
-    }
-
-
-    public void getLastReceipt(View view) {
-
-
-        setApiType(ApiType.LASTRECEIPT);
-        new TestAsync().execute();
-
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -236,27 +237,44 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    enum ApiType {LOGIN, HEALTH, PAYMENT, DETAILS, CRASHLOGS, LASTRECEIPT}
+    boolean isPaytmAppExist() {
+        final PackageManager pm = getPackageManager();
+        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+
+        for (ApplicationInfo packageInfo : packages) {
+
+
+            if (packageInfo.packageName.contains(Constants.SOFTPOS_PACKAGE_NAME_MERCHANT)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    enum ApiType {LOGIN_MERCHANT, HEALTH_MERCHANT, PAYMENT, PAYMENT_MERCHANT, DETAILS_MERCHANT, LASTRECEIPT}
 
     class TestAsync extends AsyncTask<Void, Integer, Boolean> {
         String TAG = getClass().getSimpleName();
 
         protected Boolean doInBackground(Void... arg0) {
 
-            final PackageManager pm = getPackageManager();
-            List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+//            final PackageManager pm = getPackageManager();
+//            List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+//
+//            for (ApplicationInfo packageInfo : packages) {
+//                Log.d(TAG, "Installed package :" + packageInfo.packageName);
+//                Log.d(TAG, "Source dir : " + packageInfo.sourceDir);
+//                Log.d(TAG, "Launch Activity :" + pm.getLaunchIntentForPackage(packageInfo.packageName));
+//
+//                if (packageInfo.packageName.contains(Constants.SOFTPOS_PACKAGE_NAME_MOSAMBEE)) {
+//                    return true;
+//                }
+//            }
+//
+//            return false;
 
-            for (ApplicationInfo packageInfo : packages) {
-                Log.d(TAG, "Installed package :" + packageInfo.packageName);
-                Log.d(TAG, "Source dir : " + packageInfo.sourceDir);
-                Log.d(TAG, "Launch Activity :" + pm.getLaunchIntentForPackage(packageInfo.packageName));
 
-                if (packageInfo.packageName.contains(Constants.SOFTPOS_PACKAGE_NAME)) {
-                    return true;
-                }
-            }
-
-            return false;
+            return true;
         }
 
         protected void onPostExecute(Boolean result) {
@@ -270,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
                         .show();
 
             } else {
-                if (getApiType().equals(ApiType.PAYMENT)) {
+                if (getApiType().equals(ApiType.PAYMENT_MERCHANT)) {
 
                     if ((etAmount.getText().toString() != "")) {
 
@@ -285,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         Intent intent = new Intent();
-                        intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+                        intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME_MERCHANT);
                         Bundle mBundle = new Bundle();
                         mBundle.putString("amount", String.format("%d", am));
                         mBundle.putString("sessionId", Utils.getToken(MainActivity.this));
@@ -298,7 +316,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(MainActivity.this, "Amount can not be black", Toast.LENGTH_LONG).show();
                     }
-                } else if (getApiType().equals(ApiType.LOGIN)) {
+                } else if (getApiType().equals(ApiType.LOGIN_MERCHANT)) {
 
                     if ((etUserId.getText().toString() != "") && (eTPass.getText().toString() != "")) {
                         setPassword(eTPass.getText().toString());
@@ -308,41 +326,42 @@ public class MainActivity extends AppCompatActivity {
                         Bundle mBundle = new Bundle();
                         mBundle.putString("userName", getUserId());
                         mBundle.putString("password", getPassword());
+                        mBundle.putString("key", "F2469532DB2219DC69619B86AF7F2");
                         intent.putExtras(mBundle);
                         intent.setAction(Constants.SOFTPOS_INIT_ACTION);
-                        intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+                        intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME_MERCHANT);
                         startActivityForResult(intent, Constants.ActivityLoginRequestCode);
 
 
                     }
-                } else if (getApiType().equals(ApiType.HEALTH)) {
+                } else if (getApiType().equals(ApiType.HEALTH_MERCHANT)) {
 
                     Intent intent = new Intent();
 //                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.setAction(Constants.SOFTPOS_HEALTHCHECK_ACTION);
-                    intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+                    intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME_MERCHANT);
                     Bundle bundle = new Bundle();
                     bundle.putString("sessionId", Utils.getToken(MainActivity.this));
                     intent.putExtras(bundle);
                     startActivityForResult(intent, Constants.ActivityHealthCheckRequestCode);
-                } else if (getApiType().equals(ApiType.DETAILS)) {
+                } else if (getApiType().equals(ApiType.DETAILS_MERCHANT)) {
 
                     Intent intent = new Intent();
 //                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.setAction(Constants.SOFTPOS_DETAILS_ACTION);
-                    intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+                    intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME_MERCHANT);
                     startActivityForResult(intent, Constants.ActivityDetailsRequestCode);
                 } else if (getApiType().equals(ApiType.LASTRECEIPT)) {
 
                     Intent intent = new Intent();
 //                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.setAction(Constants.SOFTPOS_LAST_TRANSACTION_ACTION);
-                    intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME);
+                    intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME_MERCHANT);
 
                     startActivityForResult(intent, Constants.ActivityLastReceiptRequestCode);
                 }
             }
         }
-    }
 
+    }
 }

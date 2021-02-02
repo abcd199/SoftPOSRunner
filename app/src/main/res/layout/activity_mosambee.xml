@@ -35,20 +35,38 @@
 
 
       <Button
-          android:text="@string/init_api"
+          android:text="@string/init_api_mosambee"
+          android:layout_marginTop="30dp"
+
           android:background="@color/colorPrimary"
           android:textColor="@android:color/white"
-          android:onClick="bTinitApi"
+          android:onClick="bTinitApiPAYTM"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           tools:ignore="OnClick" />
+
+
 
       <Button
           android:text="@string/health_check"
           android:layout_marginTop="30dp"
           android:background="@color/colorPrimary"
           android:textColor="@android:color/white"
-          android:onClick="healthCheck"
+          android:onClick="healthCheckPaytm"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          tools:ignore="OnClick" />
+
+
+
+
+
+      <Button
+          android:text="@string/get_app_details_mosambee"
+          android:layout_marginTop="30dp"
+          android:background="@color/colorPrimary"
+          android:textColor="@android:color/white"
+          android:onClick="getDetailsPaytm"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           tools:ignore="OnClick" />
@@ -61,35 +79,38 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content" />
 
-      <Button
-          android:text="@string/pay_using_softpos"
-          android:background="@color/colorPrimary"
-          android:textColor="@android:color/white"
-          android:onClick="pay"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          tools:ignore="OnClick" />
+
 
       <Button
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
+          android:text="@string/pay_using_mosambee"
           android:layout_marginTop="30dp"
           android:background="@color/colorPrimary"
-          android:onClick="getDetails"
-          android:text="@string/get_app_details"
           android:textColor="@android:color/white"
-          tools:ignore="OnClick" />
-
-
-      <Button
+          android:onClick="payPAYTM"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="30dp"
-          android:background="@color/colorPrimary"
-          android:onClick="getLastReceipt"
-          android:text="@string/get_last_receipt"
-          android:textColor="@android:color/white"
           tools:ignore="OnClick" />
+
+<!--      <Button-->
+<!--          android:layout_width="match_parent"-->
+<!--          android:layout_height="wrap_content"-->
+<!--          android:layout_marginTop="30dp"-->
+<!--          android:background="@color/colorPrimary"-->
+<!--          android:onClick="getDetails"-->
+<!--          android:text="@string/get_app_details"-->
+<!--          android:textColor="@android:color/white"-->
+<!--          tools:ignore="OnClick" />-->
+
+
+<!--      <Button-->
+<!--          android:layout_width="match_parent"-->
+<!--          android:layout_height="wrap_content"-->
+<!--          android:layout_marginTop="30dp"-->
+<!--          android:background="@color/colorPrimary"-->
+<!--          android:onClick="getLastReceipt"-->
+<!--          android:text="@string/get_last_receipt"-->
+<!--          android:textColor="@android:color/white"-->
+<!--          tools:ignore="OnClick" />-->
 
    </LinearLayout>
 

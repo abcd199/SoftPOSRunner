@@ -326,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
                         Bundle mBundle = new Bundle();
                         mBundle.putString("userName", getUserId());
                         mBundle.putString("password", getPassword());
-                        mBundle.putString("key", "F2469532DB2219DC69619B86AF7F2");
+                        mBundle.putString("key", "1234");
                         intent.putExtras(mBundle);
                         intent.setAction(Constants.SOFTPOS_INIT_ACTION);
                         intent.setPackage(Constants.SOFTPOS_PACKAGE_NAME_MERCHANT);
